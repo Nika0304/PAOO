@@ -6,85 +6,90 @@
 
 #include "heap_counter.h"
 
-int IntArray::nextId_ = 0;
+int IntArray::nextId = 0;
 
-// 3) Initializarea membrilor din constructor: lista de initializare.
-//    id_ este const, deci NU poate fi atribuit in corpul constructorului,
-//    singura lui sansa de a primi o valoare este lista de initializare.
-IntArray::IntArray(std::size_t size, int initialValue)
-    : id_(++nextId_), size_(size), data_(new int[size]) {
+//Initializarea membrilor din constructor: lista de initializare
+IntArray::IntArray(std::size_t size, int initialValue): id(++nextId), size(size), data(new int[size]) 
+{
     ++heapcounter::liveBlocks;
-    std::fill(data_, data_ + size_, initialValue);
-    std::cout << "[IntArray #" << id_ << "] constructor: am alocat " << size_
-              << " int pe heap la " << static_cast<const void*>(data_) << '\n';
+    std::fill(data, data + size, initialValue);
+    std::cout << "[IntArray #" << id << "] constructor: am alocat " << size
+              << " int pe heap la " << static_cast<const void*>(data) << '\n';
 }
 
-// 4) Destructorul elibereaza heap-ul. Fara el, fiecare obiect distrus
-//    ar lasa in urma un bloc de memorie nefolosit (scurgere de memorie).
-IntArray::~IntArray() {
-    if (data_ != nullptr) {
-        std::cout << "[IntArray #" << id_ << "] destructor: eliberez blocul de " << size_
-                  << " int de la " << static_cast<const void*>(data_) << '\n';
-        delete[] data_;
+//Destructorul elibereaza heap-ul
+IntArray::~IntArray() 
+{
+    if (data != nullptr) 
+    {
+        std::cout << "[IntArray #" << id << "] destructor: eliberez blocul de " << size
+                  << " int de la " << static_cast<const void*>(data) << '\n';
+        delete[] data;
         --heapcounter::liveBlocks;
-    } else {
-        std::cout << "[IntArray #" << id_
+    } 
+    else 
+    {
+        std::cout << "[IntArray #" << id
                   << "] destructor: nu am nimic de eliberat (continutul a fost mutat)\n";
     }
 }
 
-// 5) Copy constructor: fiecare obiect isi primeste propriul bloc pe heap.
-//    Fara el, compilatorul copiaza doar pointerul (copie superficiala) si
-//    doua obiecte ar folosi acelasi bloc (vezi ShallowArray in bad_examples).
-IntArray::IntArray(const IntArray& other)
-    : id_(++nextId_), size_(other.size_), data_(new int[other.size_]) {
+//Copy constructor: fiecare obiect isi primeste propriul bloc pe heap
+IntArray::IntArray(const IntArray& other): id(++nextId), size(other.size), data(new int[other.size]) 
+{
     ++heapcounter::liveBlocks;
-    std::copy(other.data_, other.data_ + size_, data_);
-    std::cout << "[IntArray #" << id_ << "] copy constructor: copie profunda din #" << other.id_
-              << ", bloc nou la " << static_cast<const void*>(data_) << '\n';
+    std::copy(other.data, other.data + size, data);
+    std::cout << "[IntArray #" << id << "] copy constructor: copie profunda din #" << other.id
+              << ", bloc nou la " << static_cast<const void*>(data) << '\n';
 }
 
-// 6) Move constructor: preia pointerul sursei si o lasa goala. Nu se aloca
-//    si nu se copiaza nimic, deci e foarte ieftin pentru obiecte temporare.
-IntArray::IntArray(IntArray&& other) noexcept
-    : id_(++nextId_), size_(other.size_), data_(other.data_) {
-    other.size_ = 0;
-    other.data_ = nullptr;
-    std::cout << "[IntArray #" << id_ << "] move constructor: am preluat blocul de la #"
-              << other.id_ << " (" << static_cast<const void*>(data_) << "), fara alocare\n";
+//Move constructor: preia pointerul sursei si o lasa goala
+IntArray::IntArray(IntArray&& other) noexcept: id(++nextId), size(other.size), data(other.data) 
+{
+    other.size = 0;
+    other.data = nullptr;
+    std::cout << "[IntArray #" << id << "] move constructor: am preluat blocul de la #"
+              << other.id << " (" << static_cast<const void*>(data) << "), fara alocare\n";
 }
 
-int IntArray::id() const { return id_; }
+int IntArray::getId() const { return id; }
 
-std::size_t IntArray::size() const { return size_; }
+std::size_t IntArray::getSize() const { return size; }
 
-int IntArray::get(std::size_t index) const {
-    if (index >= size_) {
+int IntArray::get(std::size_t index) const 
+{
+    if (index >= size) 
+    {
         throw std::out_of_range("index " + std::to_string(index) + " in afara limitelor (size = " +
-                                std::to_string(size_) + ")");
+                                std::to_string(size) + ")");
     }
-    return data_[index];
+    return data[index];
 }
 
-void IntArray::set(std::size_t index, int value) {
-    if (index >= size_) {
+void IntArray::set(std::size_t index, int value) 
+{
+    if (index >= size) 
+    {
         throw std::out_of_range("index " + std::to_string(index) + " in afara limitelor (size = " +
-                                std::to_string(size_) + ")");
+                                std::to_string(size) + ")");
     }
-    data_[index] = value;
+    data[index] = value;
 }
 
-const int* IntArray::data() const { return data_; }
+const int* IntArray::getData() const { return data; }
 
-void IntArray::print(const std::string& label) const {
-    std::cout << "  " << label << " -> IntArray #" << id_ << ", size = " << size_;
-    if (data_ == nullptr) {
+void IntArray::print(const std::string& label) const
+{
+    std::cout << "  " << label << " -> IntArray #" << id << ", size = " << size;
+    if (data == nullptr) 
+    {
         std::cout << ", data = nullptr (obiect gol)\n";
         return;
     }
-    std::cout << ", data = " << static_cast<const void*>(data_) << ", continut = {";
-    for (std::size_t i = 0; i < size_; ++i) {
-        std::cout << (i == 0 ? "" : ", ") << data_[i];
+    std::cout << ", data = " << static_cast<const void*>(data) << ", continut = {";
+    for (std::size_t i = 0; i < size; ++i) 
+    {
+        std::cout << (i == 0 ? "" : ", ") << data[i];
     }
     std::cout << "}\n";
 }

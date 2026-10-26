@@ -5,46 +5,49 @@
 
 #include "heap_counter.h"
 
-// ---------- LeakyArray ----------
-
-LeakyArray::LeakyArray(std::size_t size) : size_(size), data_(new int[size]) {
+//LeakyArray
+LeakyArray::LeakyArray(std::size_t size) : size(size), data(new int[size]) 
+{
     ++heapcounter::liveBlocks;
-    std::fill(data_, data_ + size_, 0);
-    std::cout << "[LeakyArray] constructor: am alocat " << size_ << " int pe heap la "
-              << static_cast<const void*>(data_) << '\n';
+    std::fill(data, data + size, 0);
+    std::cout << "[LeakyArray] constructor: am alocat " << size << " int pe heap la "
+              << static_cast<const void*>(data) << '\n';
 }
 
-int* LeakyArray::rawPointerForDemo() const { return data_; }
+int* LeakyArray::rawPointerForDemo() const { return data; }
 
-// ---------- ShallowArray ----------
-
-ShallowArray::ShallowArray(std::size_t size, int initialValue) : size_(size), data_(new int[size]) {
+//ShallowArray
+ShallowArray::ShallowArray(std::size_t size, int initialValue) : size(size), data(new int[size]) 
+{
     ++heapcounter::liveBlocks;
-    std::fill(data_, data_ + size_, initialValue);
-    std::cout << "[ShallowArray] constructor: am alocat " << size_ << " int pe heap la "
-              << static_cast<const void*>(data_) << '\n';
+    std::fill(data, data + size, initialValue);
+    std::cout << "[ShallowArray] constructor: am alocat " << size << " int pe heap la "
+              << static_cast<const void*>(data) << '\n';
 }
 
-ShallowArray::~ShallowArray() {
-    if (data_ != nullptr) {
+ShallowArray::~ShallowArray() 
+{
+    if (data != nullptr) 
+    {
         // std::endl forteaza afisarea imediata, ca mesajul sa apara chiar daca
         // programul se opreste brusc la un double free.
-        std::cout << "[ShallowArray] destructor: delete[] la " << static_cast<const void*>(data_)
+        std::cout << "[ShallowArray] destructor: delete[] la " << static_cast<const void*>(data)
                   << std::endl;
-        delete[] data_;
+        delete[] data;
         --heapcounter::liveBlocks;
     }
 }
 
-std::size_t ShallowArray::size() const { return size_; }
+std::size_t ShallowArray::getSize() const { return size; }
 
-int ShallowArray::get(std::size_t index) const { return data_[index]; }
+int ShallowArray::get(std::size_t index) const { return data[index]; }
 
-void ShallowArray::set(std::size_t index, int value) { data_[index] = value; }
+void ShallowArray::set(std::size_t index, int value) { data[index] = value; }
 
-const int* ShallowArray::data() const { return data_; }
+const int* ShallowArray::getData() const { return data; }
 
-void ShallowArray::abandon() {
-    data_ = nullptr;
-    size_ = 0;
+void ShallowArray::abandon() 
+{
+    data = nullptr;
+    size = 0;
 }

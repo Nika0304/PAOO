@@ -4,43 +4,35 @@
 #include <cstddef>
 #include <string>
 
-// Vector de int-uri alocat pe heap. Varianta CORECTA: are constructor cu lista
-// de initializare, destructor, copy constructor si move constructor.
-class IntArray {
+// vector de int-uri alocat pe heap
+// varianta corecta: are constructor cu lista de initializare, destructor,
+// copy constructor si move constructor
+class IntArray
+{
 public:
-    // Constructor. Foloseste lista de initializare (vezi int_array.cpp).
-    explicit IntArray(std::size_t size, int initialValue = 0);
+    explicit IntArray(std::size_t size, int initialValue = 0);  // constructor
+    ~IntArray();                                                 // destructor: elibereaza blocul de pe heap
+    IntArray(const IntArray& other);                             // copy constructor: copie profunda, aloca bloc nou
+    IntArray(IntArray&& other) noexcept;                         // move constructor: ia blocul de la sursa, fara alocare
 
-    // Destructor: elibereaza blocul de pe heap.
-    ~IntArray();
-
-    // Copy constructor: copie "profunda" (aloca un bloc nou si copiaza continutul).
-    IntArray(const IntArray& other);
-
-    // Move constructor: "fura" blocul de pe heap de la obiectul sursa, fara alocare.
-    IntArray(IntArray&& other) noexcept;
-
-    // Operatorii de atribuire nu fac parte din tema; ii interzicem ca sa nu
-    // apara din greseala o copie superficiala prin "a = b".
+    // atribuirea nu e ceruta in tema, o interzic ca sa nu apara din greseala o copie superficiala cu a = b
     IntArray& operator=(const IntArray&) = delete;
     IntArray& operator=(IntArray&&) = delete;
 
-    // Interfata publica (incapsulare): membrii sunt privati, accesul se face
-    // doar prin aceste metode, care verifica indexul.
-    int id() const;
-    std::size_t size() const;
-    int get(std::size_t index) const;            // arunca std::out_of_range
-    void set(std::size_t index, int value);      // arunca std::out_of_range
-    const int* data() const;                     // doar citire, folosit pentru a compara adrese in demo
+    // interfata publica: membrii sunt privati, deci accesul se face doar prin metodele astea
+    int getId() const;
+    std::size_t getSize() const;
+    int get(std::size_t index) const;        // arunca out_of_range daca indexul e prea mare
+    void set(std::size_t index, int value);  // arunca out_of_range daca indexul e prea mare
+    const int* getData() const;              // doar pentru citire, il folosesc ca sa compar adresele
     void print(const std::string& label) const;
 
 private:
-    // Ordinea declararii = ordinea in care se initializeaza membrii,
-    // indiferent de ordinea din lista de initializare.
-    static int nextId_;
-    const int id_;       // const => poate fi setat NUMAI in lista de initializare
-    std::size_t size_;
-    int* data_;
+    // membrii se initializeaza in ordinea in care sunt declarati aici
+    static int nextId;  // o singura copie pentru toata clasa, de aici iau id-urile
+    const int id;       // const, deci poate fi setat doar in lista de initializare
+    std::size_t size;   // cate elemente are
+    int* data;          // pointer catre blocul de pe heap
 };
 
-#endif  // INT_ARRAY_H
+#endif
